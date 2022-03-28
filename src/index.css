@@ -2,17 +2,54 @@
     width: 75vw;
     display: block;
     margin: auto;
-    padding: 10px;
     overflow: hidden;
     position: relative;
     box-shadow: 0px 0px white, 0em 0px 0.2em #c1c1c12b;
     box-sizing: border-box;
     border: 0;
     margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
 }
 
 .chapter-content {
     padding-top: 10px;
+    overflow: hidden;
+    min-height: 105vh;
+}
+
+.chapter-content.vCenter {
+    min-height: 94vh !important;
+}
+
+.chapter-content .chapter-title {
+    color: #c0c2cc;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.5;
+}
+
+.chapter-content comment {
+    border: 1px solid gray;
+    background: gray;
+    border-radius: 22px;
+    margin-left: 5px;
+    padding: 0px 3px;
+    display: inline-block;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: .25px;
+    color: #fff;
+    background: #c0c2cc;
+    border-radius: 18px;
+    position: relative;
+    cursor: pointer;
+    transition: opacity .3s .3s;
+    text-indent: 0px;
+}
+
+.break {
+    border-top: 1px solid #e4e4e4;
 }
 
 .book .keen-slider__slide {
@@ -44,7 +81,7 @@
     color: inherit;
 }
 
-.bookContextMenu a:hover {
+.bookContextMenu a:not(.disabled):hover {
     opacity: 0.8;
     background: gray;
 }
@@ -70,11 +107,39 @@
     border: 0;
 }
 
+.book>.options.PlayTop {
+    top: -70px;
+    width: 100%;
+    height: 35px;
+    overflow: hidden;
+    max-height: 35px;
+    min-height: 35px;
+    left: 0;
+    display: inline-table;
+    -webkit-transtition: top .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    transition: top .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    box-shadow: 0px 0px white, 0em 2px 0em #c1c1c12b !important;
+    border-radius: 0 !important;
+}
+
+.book>.options.Bottom {
+    width: 100%;
+    height: 100px;
+    overflow: hidden;
+    max-height: 35px;
+    min-height: 100px;
+    display: inline-table;
+    border-radius: 0;
+    bottom: -100px;
+    -webkit-transtition: bottom .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    transition: bottom .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+}
+
 .book>.options.Right {
     right: -70px;
     top: 8px;
-    -webkit-transtition: right .6s ease-in-out, visibility .8s ease-in-out, opacity .8s ease-in-out;
-    transition: right .6s ease-in-out, visibility .8s ease-in-out, opacity .8s ease-in-out;
+    -webkit-transtition: right .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    transition: right .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
 }
 
 .book>.options.Top {
@@ -86,67 +151,39 @@
     min-height: 35px;
     left: 0;
     display: inline-table;
-    -webkit-transtition: top .6s ease-in-out, visibility .8s ease-in-out, opacity .8s ease-in-out;
-    transition: top .6s ease-in-out, visibility .8s ease-in-out, opacity .8s ease-in-out;
+    -webkit-transtition: top .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    transition: top .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
     box-shadow: 0px 0px white, 0em 2px 0em #c1c1c12b !important;
+    border-radius: 0 !important;
 }
 
-.book>.options.Top>div {
-    display: flex !important;
-    justify-content: space-around;
-    width: 76px;
-    float: right;
-    margin: 0;
-    padding: 0;
-    margin-right: 10px;
-}
-
-.book>.options>div:not(.Top >div) {
-    justify-content: center;
-    align-items: center;
-    display: grid;
-}
-
-.book>.options>div>a,
-.book>.tbContent a {
-    margin-top: 8px;
-    display: block;
-    cursor: pointer;
-}
-
-.book>.options>div>a:hover,
-.book>.options>div>a:active {
+.book>.options.animate {
+    visibility: visible;
     opacity: 0.9;
-    box-shadow: 0px 0px white, 0em 0 0.4em #c1c1c12b;
-    border-radius: 3px;
 }
 
-.chapter-content>.cover {
-    display: flex;
-    justify-content: center;
+.book>.options.PlayTop.animate.alone {
+    top: 0px !important;
+    -webkit-transtition: bottom .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out !important;
+    transition: bottom .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out !important;
 }
 
-.chapter-content>.cover {
-    display: grid;
-    justify-content: center;
-    border-bottom: 1px solid #dddd;
-    padding-bottom: 20px;
-    padding-top: 24px;
+.book>.options.PlayTop.animate {
+    visibility: visible !important;
+    top: 55px !important;
+    -webkit-transtition: top .3s ease-in-out !important;
+    transition: top .3s ease-in-out !important;
 }
 
-.chapter-content>.cover img {
-    max-width: 210px;
-    margin: auto;
-}
-
-.chapter-content>.cover>div {
-    display: grid;
-    justify-content: center;
-    width: 100%;
+.book>.options.Bottom.animate {
+    bottom: 10px;
+    -webkit-transtition: bottom .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    transition: bottom .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    box-shadow: 0px 0px white, 0em 2px 0em #c1c1c12b !important;
+    border-radius: 0 !important;
 }
 
 .Right.animate {
-    opacity: 1 !important;
     visibility: visible !important;
     right: 0 !important;
     -webkit-transtition: right .3s ease-in-out !important;
@@ -154,11 +191,67 @@
 }
 
 .Top.animate {
-    opacity: 1 !important;
     visibility: visible !important;
-    top: 19px !important;
+    top: 0px !important;
     -webkit-transtition: top .3s ease-in-out !important;
     transition: top .3s ease-in-out !important;
+}
+
+.book>.options.Top>div>div {
+    display: flex !important;
+    justify-content: space-around;
+    min-width: 76px;
+    float: right;
+    margin: 0;
+    padding: 0;
+    margin-right: 10px;
+}
+
+.book>.options>div>div:not(.Top >div>div) {
+    justify-content: center;
+    align-items: center;
+    display: grid;
+}
+
+.book>.options>div>div>a,
+.book>.tbContent a {
+    display: flex;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+    padding: 2px 2px;
+}
+
+.book>.options>div>div>a:not(.disabled):hover,
+.book>.options>div>div>a:not(.disabled):active {
+    opacity: 0.9;
+    box-shadow: 0px 0px white, 0em 0 0.4em #c1c1c12b;
+    border-radius: 3px;
+}
+
+.chapter-content .cover {
+    display: flex;
+    justify-content: center;
+}
+
+.chapter-content .cover {
+    display: grid;
+    justify-content: center;
+    border-bottom: 1px solid #dddd;
+    padding-bottom: 20px;
+    padding-top: 24px;
+}
+
+.chapter-content .cover img {
+    max-width: 210px;
+    margin: auto;
+}
+
+.chapter-content .cover>div {
+    display: grid;
+    justify-content: center;
+    width: 100%;
 }
 
 .popup {
@@ -166,23 +259,38 @@
     border: 1px solid gray;
     border-radius: 5px;
     position: fixed;
-    margin-top: -100px;
-    margin-left: -154px;
     display: block;
     min-height: 35vh;
     box-shadow: 1px 1px #f40000, 0em 0em 0.4em red;
     left: 50%;
     top: 50%;
     max-width: 90vw;
-    max-height: 90vh;
+    max-height: 70vh;
     overflow: hidden;
     min-width: 300px;
+    -webkit-transform: translate(-50%, -50%) scale(0);
+    -moz-transform: translate(-50%, -50%) scale(0);
+    -ms-transform: translate(-50%, -50%) scale(0);
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform .3s ease-in-out;
+}
+
+.popup.show {
     z-index: 200;
-    -webkit-transform: scale(0.1);
-    -moz-transform: scale(0.1);
-    -ms-transform: scale(0.1);
-    transform: scale(0.1);
-    transition: transform 0.5s ease-in-out;
+    -webkit-transform: translate(-50%, -50%) scale(1);
+    -moz-transform: translate(-50%, -50%) scale(1);
+    -ms-transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) scale(1);
+    transition: transform .3s ease-in-out;
+}
+
+.popup>div {
+    padding: 10px;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+    max-height: 60vh;
 }
 
 .list>a {
@@ -194,11 +302,12 @@
 }
 
 .list a:nth-child(even) {
-    background: #f5f5f5
+    background: #870000;
+    color: white;
 }
 
 a.selected {
-    color: #0010ff;
+    color: #a3f700 !important;
 }
 
 .popup>h1 {
@@ -220,16 +329,6 @@ a.close {
     top: 5px;
     cursor: pointer;
     color: red;
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAYAAAAe2bNZAAAABmJLR0QA/wD/AP+gvaeTAAADIklEQVRYhe3WTUhUURQH8P8xbdGqRSZJLQoiiiDyOWmB+Yrow0oLCqxtlLSxFk/QIVfKGMwiadMiaN222hgkaUIfln1By8joy2lUTFGivOffYtRmxvfevDeTRNDZDLx599zfvffwzgX+x78e0/WNlTMNjVV/ItdYhV2d3G5X+r1T5PXHVMPpZkIGjcHjybqTrYVARi271SgfUc3g1627mkNhphtONQnZTaWAChBdUwdPXMoHkrRsRw27QAVVRYnukc1VFwJhphtONZG4Ng+hEiChZMe3/cdCgZKW7dAwPgdJ5VIVKq6MbIosAkkGpL6xkpDBbAhJQDX1azS68v7trlyQUau2TQ1iWZC5nAqqEmSk/O3zIdedEcEyX4gSBGLjtUfaCoQASjFmtjh9XAZmxa2bTwiNekKYSgYyNl5T5woKCAFUo+uGXz/J2Ay3hJOHTjhUxt0gC1BVkGhf9bCnc36cR40sgihN+9p3rzqz53XFAMDkvuOOgnEvSOq5Aobtq57e6ywU4osBgIk99W3E/Ja7QOYmE9W7qjwQ5GjKh196Fr8vBgAm7KOOqsa9INmT5rMjgTEAMLb7sANj4ksJCYwBgLGd+x1yrqiXABIKAwDJqr0ODOJLAQmNAYDRCrsnSLF++T573fr8+lyY3J5d2y2Slu0EgbyZMX3vf8rZO6XbQvWywJig35E3M6ZvysAugaBElnX0llmBQYEw+UGKsFwEJZCO/oCgnDVTCKQ4LT3B9trEkG8x++5MUMinH+aGHyS1aul4UBbx7faemDC9JvLx1ZlikRYvyO9gzO/IXEfl2/R6V1tOiUjcb/WA95EtwoS5j7g1vdRRMJYLBEh0d+JpxvgMzFiFXW2UjwrtvkFBAlbXJIYWLlgZNaPELKgsBAIAqRVLNIeFKOJs+oMMTOmLvmdUPU8lvWokFyQdREqLF0TAizVffl/GAY8CTmzZ2aRGr4Eq+Ta9+ehfHXFEmF7UKUhi6Gr2u54fvZGNkWaldkMpULaVD7+4HBayACqzWgXS5QfJGZ83bK/8sH7bjnwR6TFQZlUNrKmw/kSu//FX4xcDXiyCmTVsLwAAAABJRU5ErkJggg==");
-}
-
-.popup>div {
-    padding: 10px;
-    max-width: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: 35vh;
-    max-height: 60vh;
 }
 
 .blur {
@@ -268,6 +367,10 @@ a.close {
     width: 90%;
 }
 
+.keen-slider {
+    border-radius: 10px;
+}
+
 .keen-slider img:not([src]) {
     display: none;
 }
@@ -294,9 +397,14 @@ a.close {
     }
 }
 
-@media only screen and (max-width: 700px) {
+@media only screen and (max-width: 1022px) {
     .book {
-        width: 97vw !important;
+        width: 100vw;
+        margin-top: 0;
+        border-radius: 0;
+    }
+    .keen-slider {
+        border-radius: 0;
     }
 }
 
@@ -314,16 +422,28 @@ a.close {
 
 .fontBackground {
     display: flex;
-    justify-content: space-around;
+    height: 60px;
+    padding-left: 10px;
 }
 
 .fontBackground>a {
     border-radius: 30px;
     padding: 10px;
-    width: 38px;
-    height: 38px;
+    width: 23px;
+    height: 23px;
     display: flex;
     justify-content: center;
     align-items: center;
     box-shadow: 1px 1px #cd2727, 0em 0px 0.4em #fa12122b;
+    margin-right: 10px;
+    font-size: 10px;
+    text-align: center;
+}
+
+.fontBackground>a.selected {
+    opacity: 0.5 !important;
+}
+
+.disabled {
+    opacity: 0.5 !important;
 }

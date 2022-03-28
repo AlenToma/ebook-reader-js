@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import 'react-app-polyfill/ie11'
 import * as React from 'react';
 import { Fragment, useEffect } from "react"
 import { BookOptions, Chapter, SelectionResult, FontSettings, BookReader, IState, CSSStyle, Language, IframeSettings } from './typings';
@@ -9,40 +10,96 @@ import './index.css';
 import './fonts.css';
 import './select.css';
 import Slider from './components/Slider'
-import { getSelectionText, wait, getSelectionTextAndContainerElement, elementSize } from './Methods'
+import { getSelectionText, wait, getSelectionTextAndContainerElement, elementSize, joinStyles, getTextArray } from './Methods'
 import Loader from './components/Loader'
 import objectUseState from '@alentoma/usestate'
 import Iframe from './components/Iframe'
 import BookReaderBase from './abstract';
-import DefaultSettings from './defaultSettings';
+import Icons from './components/Icons';
+import Context from './Context'
+import defaultSettings from "./defaultSettings";
+import { Body } from './components/Body';
+import BottomMenu from './components/BottomMenu';
+import BookMenu from './components/BookMenu';
+import PlayMenu from './components/PlayMenu';
 
-
-
-const tbContentIcons = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAYAAAAe2bNZAAAABmJLR0QA/wD/AP+gvaeTAAAAiklEQVRYhe3TwQkCMRAF0OdiC57tyAosxPvuwUKswIKEbUS9REgOIntYssh/EEjIIcNkPhHL7Dq+e8SAJ2a8OtViKo9/1gT7cnnCeeUCbriX/QEPXHAtZ8PKBdS6fcMvo/abRjLA36UzEu3Wtga0kmgvks5ItFvbGtBKor1IOiPRbm1rQCuJdvyfN8LGTF05WoI9AAAAAElFTkSuQmCC"/>`
-const settingsIcons = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAYAAAAe2bNZAAAABmJLR0QA/wD/AP+gvaeTAAADqUlEQVRYhdXXy29VVRQG8J+3pbU2qPgaGhOJD8RI1dJQhbEPZKYRJxp8TdVCjMYnCqhoxAGC/gkOBMUqinNigIgIaBRjFKMmjchAbbEPHKx9uYfTc+653DZGv+QMzt5rr/Xttddae23+QzhrBmu7sA7nZsZG8AymZkKqHdyEkziAvTiU/hf+20TgQUyiJ/1fkMjc3a7CWsX8IJaVzF2N7zGa/o/hZ1xbIr8US86UYB23JkNTeEvDA3XsxHu5sY/xfm5sDp4TXjyBFWdKZHlauA2rMYb9WCA88gb+wvrcupfxJzbiclyJfUnXGmxPum5vlchAhsicNNaHw2l8KhF7QsRJFhfh2SQ7KTz7NW5I810ZQv2tkFmEcazNjZ+Dp3BHCzpquBPPozc3tzbpX9QKGRpnXBa87WIQE6IWtYxO7MZ3mDtLRHrxDfZoHH/LuELEyNMVch0idjoq5NaJoJ9fJtCsznSlb2/J/ACGk4HfRBZ9gMUl8geTvommlEvwpkjLItwvgvBzPCKC9VGRZeNYVbCmhm/xUpXhLtyMh7AJn4i0XF0gO5AMbjbdsx3YkuaLUvdF/CEK5mt4QAT1aTH0irhXJkSQvStS8LwChcPCI2VH3CEuzx0FcxdjQ5o7IjL2pCiWp7AVX+LsEgNZQ2PiaJrhMeHZqqDuSXa3cvruTiRDzTAP3ThaIfeD2Nj5FXKjya48mZ5krBl+T4svrZC7TGzseIXcPJkLuE5mRFyCx8SuPxSXYH5nk/gU9yo/gk7ch11JPotLRDbtxE/J3oJk/xRqog+5RwTYsPJsWiyyZUsBoU68jb9xY8HaejbtSHZWJrtVfZXNyuvMqkToCwyJOjMkgnFceCaPep3ZUGW4CAtF2t1WMt8vdjiW5EZFY1XkEcILEyKeCtHZhMyU2GWfiKE89oh2oiZi67jmr4Jrkr7uJjKF6BaF7bDoY2YDvaLR2icqfst4Xbi/b5aI1HG9KA0bW12wTLh7KDc+VzRdK1Q//mq4S2RPvh9ak/QvbYXMoPDKdg13LhF3yVhSdABPml4kLxRd3FcaPfARjSdKtgcebIUM0b2Piab8BZEFu0VjdJV4HYya3ievF33Nq+J1MD+tm0h6tiW9y1slUsctyeC4qJr5VnFXUp7FR6LByqITj4tC2Na7qY5+XFcyt0m0G1kcVV7U+pR3gTPGw8L9+bf2ynYVNit6VTgk7qbPxBHUSR1sV2FV89MMv4qeZQS/4EdxG78jPPT/xj/Lf+MNpkdIUQAAAABJRU5ErkJggg=="/>`
-
-
-const BookReaderElement = ({ props, selector }: { props: BookOptions, selector: BookReader }) => {
+const startScrollPos = 150;
+const maxLoadedChapters = 50;
+const BookReaderElement = ({ props, selector, DefaultSettings }: { props: BookOptions, selector: BookReader, DefaultSettings: BookOptions }) => {
   const copy = function <T>(item: T) {
     if (item)
       return { ...item };
     else return item;
   }
-  const state = objectUseState({
+  const state = objectUseState<IState>({
     isLoading: true,
+    viewBookMenu: false,
+    viewPlayer: false,
     viewChapters: false,
     viewFontSettings: false,
+    viewBottomMenu: false,
     currentChapter: undefined as Chapter | undefined,
     currentindex: props.book.currentChapterIndex || 0,
-    chapterContent: [] as { html: JSX.Element, index: number }[],
+    textToSpeechProgress: 0,
+    chapterContent: [] as { html: JSX.Element, index: number, chapter: Chapter }[],
     language: props.language || copy(DefaultSettings.language || {} as Language),
     fontSettings: props.fontSettings || copy(DefaultSettings.fontSettings || {} as FontSettings),
     iframeSettings: props.iframeSettings || copy(DefaultSettings.iframeSettings || {} as IframeSettings),
-    fonts: props.book.fonts || copy(DefaultSettings.book.fonts || {} as CSSStyle)
+    fonts: props.book.fonts || copy(DefaultSettings.book.fonts || {} as CSSStyle),
+    isPrev: false,
+    navigationChapterController: props.navigationChapterController || "Scroll",
+    playableText: [],
+    playing: false,
+    windowSize: { width: window.document.body.clientWidth, height: window.document.body.clientHeight },
+    userAction: false,
   }, false, undefined, 0)
 
+  const play = async (progress: number, doNotTriggerUpdate?: boolean) => {
+    if (state.currentChapter) {
+      state.textToSpeechProgress = progress;
+      state.currentChapter.textToSpeechProgress = progress;
+      state.playing = true;
+      state.viewPlayer = true;
+      if (!doNotTriggerUpdate)
+        await selector.trigger("OnPlay", { ChapterChangedEvent: { chapter: state.currentChapter, isUserAction: state.userAction } });
+    }
+  }
 
-  const saveFontSettings = ({ background, fontSize, lineHeight, paddingLeft, className }: CSSStyle) => {
+  const pause = async (doNotTriggerUpdate?: boolean) => {
+    if (state.playing && state.currentChapter) {
+      state.playing = false;
+      if (!doNotTriggerUpdate)
+        await selector.trigger("OnPause", { ChapterChangedEvent: { chapter: state.currentChapter, isUserAction: state.userAction } });
+    }
+  }
+
+  const playNext = async (doNotTriggerUpdate?: boolean) => {
+    if (state.currentChapter && state.textToSpeechProgress + 1 < state.playableText.length) {
+      state.textToSpeechProgress++;
+      state.currentChapter.textToSpeechProgress = state.textToSpeechProgress;
+
+      if (!doNotTriggerUpdate)
+        selector.trigger("onProgressChanged", { ChapterChangedEvent: { chapter: state.currentChapter, isUserAction: state.userAction } });
+    } else if (state.currentChapter && state.textToSpeechProgress == state.playableText.length - 1) {
+      if (hasNext()) {
+        {
+          await selector.trigger("onEnd", { ChapterChangedEvent: { chapter: state.currentChapter, isUserAction: state.userAction } });
+          next(); // load next chapter
+        }
+      } else await pause()
+    }
+  }
+
+  const playPrev = async (doNotTriggerUpdate?: boolean) => {
+    if (state.currentChapter && state.textToSpeechProgress - 1 >= 0) {
+      state.textToSpeechProgress--;
+      state.currentChapter.textToSpeechProgress = state.textToSpeechProgress;
+      if (!doNotTriggerUpdate)
+        await selector.trigger("onProgressChanged", { ChapterChangedEvent: { chapter: state.currentChapter, isUserAction: state.userAction } });
+    }
+  }
+
+  const saveFontSettings = ({ background, fontSize, lineHeight, paddingLeft, className, textFormatter }: CSSStyle) => {
     var fn = { ...state.fonts };
 
     if (background)
@@ -56,8 +113,16 @@ const BookReaderElement = ({ props, selector }: { props: BookOptions, selector: 
     if (paddingLeft) {
       fn.paddingLeft = fn.paddingRight = paddingLeft;
     }
-    if (className)
+    if (className) {
+      const font = state.fontSettings.fonts?.find(x => x.className == className);
       fn.className = className;
+      if (font && font.title)
+        fn.title = font.title;
+    }
+
+    if (textFormatter) {
+      fn.textFormatter = textFormatter;
+    }
 
     state.fonts = fn;
   }
@@ -65,7 +130,6 @@ const BookReaderElement = ({ props, selector }: { props: BookOptions, selector: 
   const bookdiv = React.useRef(null as HTMLDivElement | null);
   const animateToggleTimer = React.useRef<any>()
   const prevSelection = React.useRef("");
-  const chapterRef = React.useRef(null as HTMLDivElement | null);
   const popOverTimer = React.useRef<any>();
   const scrollTimer = React.useRef<any>();
 
@@ -76,90 +140,250 @@ const BookReaderElement = ({ props, selector }: { props: BookOptions, selector: 
         <img src={image} />
         <div>
           <h2 className="title">{props.book.title}</h2>
-          {props.book.bookParams?.map(x => (<p style={{ margin: "auto" }}>${x.text}: ${x.value}</p>)) || null}
+          <div className='booksParams' style={{ display: "grid", justifyContent: "center" }}>
+            {props.book.bookParams?.map((x, i) => (<p key={i} style={{ margin: "auto 0" }}>{x.text}: {x.value}</p>)) || null}
+          </div>
         </div>
       </div>
     )
   }
 
+
+
   const fixScroll = () => {
-    if (state.currentChapter) {
-      onWindowSize();
-      var sc = props.book.startScrollPosition && state.currentChapter.scrollPosition && props.book.startScrollPosition >= state.currentChapter.scrollPosition ? props.book.startScrollPosition : state.currentChapter.scrollPosition;
-      if (sc === undefined)
-        sc = state.currentChapter.scrollPosition || props.book.startScrollPosition;
-      if (sc !== undefined) {
-        window.scrollTo(0, sc);
+    try {
+      console.log("Here")
+      if (state.currentChapter) {
+        onWindowSize();
+        if (state.navigationChapterController != "Scroll" || state.chapterContent.length === 1) {
+          var sc = props.book.startScrollPosition && state.currentChapter.scrollPosition && props.book.startScrollPosition >= state.currentChapter.scrollPosition ? props.book.startScrollPosition : state.currentChapter.scrollPosition;
+          if (sc === undefined)
+            sc = state.currentChapter.scrollPosition || props.book.startScrollPosition;
+          if (state.currentindex > 0 && state.navigationChapterController === "Scroll" && (sc === undefined || sc < startScrollPos))
+            sc = startScrollPos;
+          if (sc !== undefined) {
+            window.scrollTo(0, sc);
+          }
+        } else if (state.navigationChapterController === "Scroll") {
+          if (state.isPrev) {
+            var el = document.querySelector(`[data-chapterindex='${state.currentindex}']`) as HTMLElement;
+            if (el) {
+              var sizeInfo = elementSize(el);
+              window.scrollTo(0, (sizeInfo.rec.height + sizeInfo.rec.top) - (state.isPrev ? startScrollPos : 0));
+            }
+          }
+        }
+
+        if (state.isPrev)
+          state.isPrev = false;
       }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (state.isLoading)
+        state.isLoading = false;
     }
   }
+
 
 
   const loadChapter = async (index: number) => {
-    if (props.book.chapters.length <= 0 || index >= props.book.chapters.length || index < 0) {
-      return;
-    }
-    chapterRef.current = null;
+    try {
+      if (props.book.chapters.length <= 0 || index >= props.book.chapters.length || index < 0) {
+        return;
+      }
 
-    state.isLoading = true;
-    var cChapter = state.chapterContent.find(x => x.index == index);
-    if (cChapter) {
-      if (props.book.onChapterChange)
-        await props.book.onChapterChange(props.book.chapters[index], state.currentChapter);
+      state.isLoading = true;
+      var chap = props.book.chapters[index];
+      var cChapter = state.chapterContent.find(x => x.index == index);
+      if (cChapter) {
+        state.textToSpeechProgress = chap.textToSpeechProgress || 0
+        state.currentChapter = props.book.chapters[index];
+        state.currentindex = index;
+        state.isLoading = false;
+        await wait(100)
+        return;
+      }
 
-      state.currentChapter = props.book.chapters[index];
+
+      if (typeof chap.htmlContent !== "string")
+        chap.htmlContent = await (chap.htmlContent as (chp: Chapter) => Promise<string>)(chap);
+
+      const iframe = <Iframe onloaded={fixScroll} html={chap.htmlContent} />
+      let deletedElements = [] as { index: number }[]
+      if (state.navigationChapterController !== "Scroll" || !state.isPrev || state.chapterContent.length == 0) {
+        if (state.chapterContent.length >= maxLoadedChapters)
+          deletedElements = state.chapterContent.splice(0, maxLoadedChapters / 2);
+        state.chapterContent = [...state.chapterContent.filter(x => !deletedElements.find(a => a.index === x.index)), { html: iframe, index, chapter: chap }];
+      }
+      else {
+        if (state.chapterContent.length >= maxLoadedChapters)
+          deletedElements = state.chapterContent.splice(maxLoadedChapters / 2, maxLoadedChapters / 2);
+        state.chapterContent = [{ html: iframe, index, chapter: chap }, ...state.chapterContent.filter(x => !deletedElements.find(a => a.index === x.index))];
+      }
+      state.textToSpeechProgress = chap.textToSpeechProgress || 0
+      state.currentChapter = chap;
       state.currentindex = index;
-      state.isLoading = false;
-      await wait(100)
-      return;
+      await wait(100);
+    } catch (e) {
+      console.error(e);
     }
-    var chap = props.book.chapters[index];
-    if (typeof chap.htmlContent !== "string")
-      chap.htmlContent = await (chap.htmlContent as (chp: Chapter) => Promise<string>)(chap);
-    const iframe = <Iframe onloaded={fixScroll} iframeSettings={props.iframeSettings} html={chap.htmlContent} />
-    state.isLoading = false;
-    state.chapterContent = [...state.chapterContent, { html: iframe, index }];
-    state.currentChapter = chap;
-    state.currentindex = index;
-    if (props.book.onChapterChange)
-      await props.book.onChapterChange(chap, state.currentChapter);
-
-    await wait(100)
-
   }
 
+  const bottomReached = () => {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 40) {
+      return true;
+    }
+    return false;
+  }
+
+  const topReached = () => {
+    if (window.scrollY <= 40) {
+      return true;
+    }
+    return false;
+  }
+
+
+
+  const next = () => {
+    if (!hasNext())
+      return;
+    if (state.navigationChapterController === "Scroll") {
+      if (state.chapterContent.length <= 0)
+        return;
+      var lastIndex = state.chapterContent[state.chapterContent.length - 1].index;
+      if (lastIndex + 1 < props.book.chapters.length) {
+        state.currentindex = lastIndex + 1;
+      }
+    } else state.currentindex++;
+  }
+
+
+  const prev = () => {
+    if (!hasPrev())
+      return;
+    if (state.navigationChapterController === "Scroll") {
+      var firstIndex = state.chapterContent[0].index;
+      if (firstIndex - 1 >= 0) {
+        state.isPrev = true;
+        state.currentindex = firstIndex - 1;
+      }
+    } else state.currentindex--;
+  }
+
+  const hasNext = () => {
+    if (state.navigationChapterController === "Scroll") {
+      if (state.chapterContent.length <= 0)
+        return false;
+      var lastIndex = state.chapterContent[state.chapterContent.length - 1].index;
+      if (lastIndex + 1 < props.book.chapters.length)
+        return true;
+      return false;
+    } else {
+      if (state.currentindex + 1 < props.book.chapters.length)
+        return true;
+
+      return false;
+    }
+  }
+
+  const hasPrev = () => {
+    if (state.navigationChapterController === "Scroll") {
+      if (state.chapterContent.length <= 0)
+        return false;
+      var firstIndex = state.chapterContent[0].index;
+      if (firstIndex - 1 >= 0) {
+        return true;
+      }
+
+      return false;
+    } else {
+      if (state.currentindex - 1 >= 0)
+        return true;
+
+      return false;
+    }
+  }
+
+  const goTo = (index: number, userAction?: boolean) => {
+    if (state.isLoading)
+      return;
+    if (index >= props.book.chapters.length || 0 > index)
+      return;
+    state.userAction = userAction || state.userAction;
+    state.chapterContent.splice(0, state.chapterContent.length);
+    state.currentindex = index;
+  }
+
+
   const onScroll = (event: any) => {
+    if (state.viewPlayer)
+      return;
     clearTimeout(scrollTimer.current);
+    if (state.isLoading || state.chapterContent.length <= 0)
+      return;
     scrollTimer.current = setTimeout(() => {
       if (state.currentChapter && !state.isLoading) {
         state.currentChapter.scrollPosition = document.documentElement.scrollTop;
-        if (props.onScroll)
-          props.onScroll(document.documentElement.scrollTop, event);
+        selector.trigger("onScroll", { ScrollEvent: { scrollTop: document.documentElement.scrollTop, event: event } });
       }
 
+      if (state.navigationChapterController === "Scroll" && bottomReached()) {
+        next();
+      } else if (state.navigationChapterController === "Scroll" && topReached())
+        prev();
     }, 500);
   }
 
   const onWindowSize = () => {
-    if (bookdiv.current) {
-      var sizeInfo = elementSize(bookdiv.current);
-      var option = bookdiv.current.querySelector(".options") as HTMLDivElement;
-      if (option) {
-        const optionSizeInfo = elementSize(option);
-
-        if (props.bookMenu && props.bookMenu.position === "Top") {
-          option.style.width = (sizeInfo.elementWidth - (optionSizeInfo.paddingLeft + optionSizeInfo.paddingRight)) + "px";
-          option.style.left = (sizeInfo.rec.left + (optionSizeInfo.paddingLeft + optionSizeInfo.paddingRight)) + "px"
-        }
+    try {
+      state.windowSize = { width: window.document.body.clientWidth, height: window.document.body.clientHeight };
+      if (bookdiv.current) {
+        var sizeInfo = elementSize(bookdiv.current);
+        var options = Array.from(bookdiv.current.querySelectorAll(".options")) as HTMLDivElement[];
+        options.forEach(option => {
+          const optionSizeInfo = elementSize(option);
+          if ((props.bookMenu && option.classList.contains("Top")) || option.classList.contains("Bottom") || option.classList.contains("PlayTop")) {
+            option.style.width = (sizeInfo.elementWidth - (optionSizeInfo.paddingLeft + optionSizeInfo.paddingRight)) + "px";
+            option.style.left = (sizeInfo.rec.left) + "px"
+          }
+        })
       }
+    } catch (e) {
+      console.error(e)
     }
   }
 
+  React.useEffect(() => {
+    if (state.__isInitialized) {
+      state.chapterContent.splice(0, state.chapterContent.length);
+      loadChapter(state.currentindex);
+    }
+  }, [state.navigationChapterController])
 
+  useEffect(() => {
+    if (!state.viewPlayer && state.playing)
+      pause();
+    onWindowSize();
+  }, [state.viewPlayer])
+
+  useEffect(() => {
+    if (state.playing)
+      pause();
+  }, [state.fonts.textFormatter])
+
+  useEffect(() => {
+    if (state.__isInitialized)
+      selector.trigger("onFontsChanged", { FontEvent: { font: state.fonts } });
+  }, [state.fonts])
+
+  const contextValue = { props, state, next, prev, goTo, hasPrev, hasNext, play: play, pause: pause, playNext: playNext, playPrev: playPrev };
 
   useEffect(() => {
     window.addEventListener("scroll", onScroll);
     window.addEventListener("resize", onWindowSize);
+    (selector as any).onStart(contextValue);
     loadChapter(props.book.currentChapterIndex || 0);
     return () => {
       clearTimeout(scrollTimer.current);
@@ -168,14 +392,27 @@ const BookReaderElement = ({ props, selector }: { props: BookOptions, selector: 
     }
   }, [])
 
+  useEffect(() => {
+    if (state.currentChapter)
+      state.textToSpeechProgress = state.currentChapter.textToSpeechProgress || 0;
+    if (state.__isInitialized && state.currentChapter) {
+      selector.trigger("onChapterChanged", { ChapterChangedEvent: { chapter: state.currentChapter, isUserAction: state.userAction } });
+    }
+
+    if (state.userAction)
+      state.userAction = false;
+  }, [state.currentChapter])
 
   useEffect(() => {
-    (selector as any).update(state, loadChapter);
-  }, [state.isLoading, state.currentindex, state.currentChapter])
+    if (state.currentChapter && !state.isLoading)
+      state.currentChapter.textToSpeechProgress = state.textToSpeechProgress;
+  }, [state.textToSpeechProgress])
 
   useEffect(() => {
-    if (state.__isInitialized)
+    if (state.__isInitialized) {
       loadChapter(state.currentindex);
+    }
+
   }, [state.currentindex])
 
   useEffect(() => {
@@ -189,8 +426,10 @@ const BookReaderElement = ({ props, selector }: { props: BookOptions, selector: 
   }, [state.fonts])
 
 
+
   useEffect(() => {
     if (state.viewChapters) {
+
       const chList = document.querySelector(".chapterList");
       if (chList && chList.parentElement && chList.children.length > 0) {
         var rec = chList.children[state.currentindex].getBoundingClientRect();
@@ -201,271 +440,231 @@ const BookReaderElement = ({ props, selector }: { props: BookOptions, selector: 
 
 
   const toggleOptions = (event: any) => {
-    const optionsDiv = (event.target as HTMLElement).closest(".book");
-    const bookMenu = (event.target as HTMLElement).closest(".bookMenu")
+
     clearTimeout(animateToggleTimer.current);
-    if (prevSelection.current.length >= 1) {
-      if (getSelectionText().length <= 0)
+    let target = (event.target as HTMLElement)
+
+    const optionsDiv = target.closest(".book");
+    const bookMenu = target.closest(".bookMenu")
+    const bookContextMenu = document.querySelector(".bookContextMenu");
+    if (bookContextMenu || getSelectionText().length)
+      return;
+
+    if (prevSelection.current.length > 0) {
+      animateToggleTimer.current = setTimeout(() => {
         prevSelection.current = "";
+      }, 100);
 
       return;
+    } else {
+      animateToggleTimer.current = setTimeout(() => {
+        if (getSelectionText().length > 0) {
+          optionsDiv?.querySelectorAll(".options:not(.PlayTop)").forEach(x => x.classList.remove("animate"));
+          state.viewBookMenu = false;
+          return;
+        }
+        if (bookMenu)
+          return;
+
+        if (optionsDiv) {
+          optionsDiv?.querySelectorAll(".options:not(.PlayTop)").forEach(x => x.classList.toggle("animate"));
+          state.viewBookMenu = !state.viewBookMenu;
+          selector.trigger("onChapterClick", {});
+        }
+        //prevSelection.current = "";
+      }, 500);
     }
-    animateToggleTimer.current = setTimeout(() => {
-      if (getSelectionText().length > 1) {
-        optionsDiv?.querySelector(".options")?.classList.remove("animate");
-        return;
-      }
-      if (bookMenu)
-        return;
-
-      if (optionsDiv) {
-        optionsDiv.querySelector(".options")?.classList.toggle("animate");
-      }
-      prevSelection.current = "";
-    }, 200);
-  }
-
-  const validChapterStyle = (style: CSSStyle) => {
-    var st = { ...style };
-    delete st.background;
-    delete st.className;
-    delete st.title;
-    return st as React.CSSProperties;
   }
 
   return (
     <Fragment>
-      <div ref={bookdiv} style={{ ...state.fonts.background?.bodyStyle }} className={"book " + (props.cssClass || "")}>
-        <Loader isLoading={state.isLoading} />
-        {
-          props.nextChapterController == "Scroll" ? (
-            <div ref={chapterRef} onContextMenu={(e) => e.preventDefault()} data-current-index={state.currentindex} style={Object.assign({ ...state.fonts.background?.chapterStyle }, validChapterStyle(state.fonts))} className={"chapter-content " + state.fonts.className} onClick={toggleOptions}>
-              {state.currentindex === 0 ? getFrontPage() : null}
-              <div>
-                {state.chapterContent.find(x => x.index == state.currentindex)?.html}
-              </div>
-            </div>
-          ) : (<Slider currentIndex={state.currentindex} onChapterLoad={async (index) => { state.currentindex = index; }}>
-            <div ref={chapterRef} onContextMenu={(e) => e.preventDefault()} data-current-index={state.currentindex} style={Object.assign({ ...state.fonts.background?.chapterStyle }, validChapterStyle(state.fonts))} className={"chapter-content " + state.fonts.className} onClick={toggleOptions}>
-              {state.currentindex === 0 ? getFrontPage() : null}
-              <div>
-                {state.chapterContent.find(x => x.index == state.currentindex)?.html}
-              </div>
-            </div>
-          </Slider>)
-        }
-        {
-          props.textSelectionMenu && props.textSelectionMenu.menus.length > 0 ? (
-            <Popover
-              render={
-                ({ clientRect, isCollapsed, textContent }) => {
-                  try {
-                    if (clientRect == null || isCollapsed || !textContent || textContent.length <= 0) {
-                      return null
-                    }
-                    prevSelection.current = textContent || "";
-                    var row = "";
-                    var column = "";
-                    if (props.textSelectionMenu) {
-                      props.textSelectionMenu.menus.forEach((_, i) => {
-                        if (i % 3 === 0)
-                          row += " 1fr";
-                      });
+      <Context.Provider value={contextValue}>
+        <div ref={bookdiv} style={{ ...state.fonts.background?.bodyStyle }} className={"book " + (props.cssClass || "")}>
+          {
+            props.bottomMenu?.disabled !== true ? (
+              <BottomMenu />
+            ) : null
+          }
 
-                      if (props.textSelectionMenu.menus.length >= 3)
-                        column = "1fr 1fr 1fr";
-                      else column = props.textSelectionMenu.menus.map(() => "1fr").join(" ");
-                    }
-                    var left = document.documentElement.scrollLeft + (clientRect.left + clientRect.width / 2);
+          {
+            props.bookMenu?.playerButtonDisabled !== true ? (
+              <PlayMenu />
+            ) : null
+          }
 
-                    const style = {
-                      position: "absolute",
-                      left: left,
-                      top: document.documentElement.scrollTop + (clientRect.top - 40),
-                      marginLeft: -75,
-                      gridTemplateColumns: column,
-                      gridTemplateRows: row
-                    } as React.CSSProperties
-                    const popupref = React.useRef(null as HTMLDivElement | null)
-                    const fixPosition = () => {
-                      if (popupref.current) {
-                        var pos = popupref.current.getBoundingClientRect();
-                        if (pos.left + pos.width > window.outerWidth) {
-                          popupref.current.style.left = "unset";
-                          popupref.current.style.right = "6px";
+          {
+            props.bookMenu?.position !== "None" ? (
+              <BookMenu saveFontSettings={saveFontSettings} />
+            ) : null
+          }
+
+          <Loader isLoading={state.isLoading} />
+          {
+            state.navigationChapterController == "Scroll" && !state.viewPlayer ? (
+              <div onContextMenu={(e) => e.preventDefault()} data-current-index={state.currentindex}
+                style={joinStyles(state.fonts.background?.chapterStyle, state.fonts, { paddingTop: state.currentindex > 0 && !state.chapterContent.find(x=> x.index === 0) ? startScrollPos : undefined, paddingBottom: startScrollPos })}
+                className={"chapter-content " + state.fonts.className + " " + props.navigationChapterController} onClick={toggleOptions}>
+                <div>
+                  {
+                    state.chapterContent.map((x, index) => (
+                      <div className={index > 0 ? "break" : ""} key={x.index} data-chapterindex={x.index}>
+                         {x.index === 0 ? getFrontPage() : null}
+                        {
+                          props.book.showChapterTitle ? (
+                            <h2 className='chapter-title'>{x.chapter.title}</h2>
+                          ) : null
                         }
-                      }
-                    }
-                    React.useEffect(() => {
-                      fixPosition();
-                    }, [popupref.current])
-
-                    React.useEffect(() => {
-                      fixPosition();
-                    }, [])
-                    var sElement = getSelectionTextAndContainerElement();
-
-                    if (!sElement || !sElement.containerElement)
-                      return null;
-                    else if (!sElement.containerElement.classList.contains("chapter-content") && !sElement.containerElement.closest(".chapter-content"))
-                      return null;
-                    else if (sElement.containerElement.closest(".cover"))
-                      return null;
-
-                    return <div ref={(c => {
-                      popupref.current = c;
-                      fixPosition();
-                    })} className='bookContextMenu' style={style}>
-                      {
-                        props.textSelectionMenu?.menus.map((x, i) => (
-                          <a key={i} href="#" onClick={() => {
-                            var result = {
-                              selectedText: textContent,
-                              rec: clientRect,
-                              menuIndex: i
-                            } as SelectionResult
-                            if (props.textSelectionMenu?.click)
-                              props.textSelectionMenu.click(result);
-                          }}>
-                            {
-                              x.icon && typeof x.icon === "string" ? (<img src={x.icon} />) : null
-                            }
-                            {
-                              x.icon && typeof x.icon !== "string" ? (x.icon) : null
-                            }
-                            {x.text}
-                          </a>
-                        ))
-                      }
-                    </div>
-                  } catch (e) {
-                    console.log(e)
-                    // alert("Error")
-                    return null;
-                  }
-                }
-              }
-            />
-          ) : null
-        }
-        {
-          props.bookMenu?.position !== "None" ? (
-            <div className={"options " + (props.bookMenu && props.bookMenu.position ? props.bookMenu.position : "Right")}>
-              <div style={props.bookMenu && props.bookMenu.position == "Top" ? {
-                minWidth: (props.bookMenu.chapterButtonDisabled !== true ? 35 : 0) + (props.bookMenu.fontsButtonDisabled !== true ? 35 : 0) + ((props.bookMenu.buttons || [])?.length * 35)
-              } : undefined}>
-                {
-                  !props.bookMenu || props.bookMenu.chapterButtonDisabled !== true ? (
-                    <a onClick={() => state.viewChapters = true} title={state.language?.chaptersSettings?.tableOfContentIconTitle} dangerouslySetInnerHTML={{ __html: tbContentIcons }}></a>
-                  ) : null
-                }
-
-                {
-                  !props.bookMenu || props.bookMenu.fontsButtonDisabled !== true ? (
-                    <a onClick={() => state.viewFontSettings = true} title={state.language?.fontsSettings?.fontsIconTitle} dangerouslySetInnerHTML={{ __html: settingsIcons }}></a>
-                  ) : null
-                }
-
-                {
-                  props.bookMenu && props.bookMenu.buttons ? (
-                    props.bookMenu.buttons.map((x, index) => (<a className={x.className} onClick={x.action} title={x.title}> {
-                      typeof x.icon === "string" ? <img src={x.icon} /> : x.icon
-                    } </a>))
-                  ) : null
-                }
-              </div>
-            </div>
-          ) : null}
-      </div>
-
-      {
-        state.viewChapters ? (
-          <Dialog onclose={() => state.viewChapters = false} title={state.language?.chaptersSettings?.tableOfContentHeaderText}>
-            <div className='list chapterList'>
-              {props.book.chapters.map((x, i) => (
-                <a key={i} className={state.currentindex == i ? "selected" : ""} onClick={() => loadChapter(i)}>{x.title}</a>
-              ))}
-            </div>
-          </Dialog>
-        ) : null
-      }
-
-      {
-        state.viewFontSettings ? (
-          <Dialog onclose={() => state.viewFontSettings = false} title={state.language?.fontsSettings?.fontsHeaderText}>
-            <div className='form fontSettings'>
-              <div>
-                <label>{state.language?.fontsSettings.chooseFontLabel}:</label>
-                <select className='select-css' value={state.fonts.className} onChange={e => {
-                  if (state.fontSettings?.fonts && state.fontSettings?.fonts.length > 0)
-                    saveFontSettings({ className: e.target.value });
-                }}>
-                  {
-                    state.fontSettings?.fonts?.map((x, index) => (
-                      <option value={x.className} key={index}>{x.title}</option>
-                    ))
-                  }
-                </select>
-              </div>
-
-
-              <div>
-                <label>{state.language?.fontsSettings.fontLineHeightLabel}:</label>
-                <select className='select-css' value={state.fonts.lineHeight} onChange={x => saveFontSettings({ lineHeight: parseFloat(x.target.value) })}>
-                  {
-                    state.fontSettings?.lineHeights?.map((x, index) => (
-                      <option value={x} key={index}>{(x * 100)}%</option>
-                    ))
-                  }
-                </select>
-              </div>
-
-              <div>
-                <label>{state.language?.fontsSettings.fontSizeLabel}:</label>
-                <select className='select-css' value={state.fonts.fontSize} onChange={x => saveFontSettings({ fontSize: parseInt(x.target.value) })}>
-                  {
-                    state.fontSettings?.fontSizes?.map((x, index) => (
-                      <option value={x} key={index}>{x}</option>
-                    ))
-                  }
-                </select>
-              </div>
-
-              <div>
-                <label>{state.language?.fontsSettings.marginLeftRightLabel}:</label>
-                <select className='select-css' value={state.fonts.paddingLeft} onChange={x => saveFontSettings({ paddingLeft: parseInt(x.target.value) })}>
-                  {
-                    state.fontSettings?.marginLeftRight?.map((x, index) => (
-                      <option value={x} key={index}>{(x)}</option>
-                    ))
-                  }
-                </select>
-              </div>
-
-              <div>
-                <label>{state.language?.fontsSettings.backgroundStyleLabel}:</label>
-                <div className='fontBackground'>
-                  {
-                    state.fontSettings?.background?.map((x, index) => (
-                      <a className={(state.fonts.background?.name === x.name ? "selected" : "")} onClick={() => saveFontSettings({ background: x })} style={{ background: x.chapterStyle.background, backgroundColor: x.chapterStyle.backgroundColor, color: x.chapterStyle.color }}> {x.name} </a>
+                        {x.html}
+                      </div>
                     ))
                   }
                 </div>
               </div>
-            </div>
-          </Dialog>
-        ) : null
-      }
+            ) : null}
+          {state.navigationChapterController == "Swaper" && !state.viewPlayer ?
+            (<Slider currentIndex={state.currentindex} onChapterLoad={async (index) => { state.currentindex = index; }}>
+              <div onContextMenu={(e) => e.preventDefault()} data-current-index={state.currentindex} style={joinStyles(state.fonts.background?.chapterStyle, state.fonts)} className={"chapter-content " + state.fonts.className + " " + state.navigationChapterController} onClick={toggleOptions}>
+                {state.currentindex === 0 ? getFrontPage() : null}
+                <div>
+                  {
+                    props.book.showChapterTitle ? (
+                      <h2 className='chapter-title'>{state.chapterContent.find(x => x.index == state.currentindex)?.chapter.title}</h2>
+                    ) : null
+                  }
+                  {
+                    state.chapterContent.find(x => x.index == state.currentindex)?.html
+                  }
+                </div>
+              </div>
+            </Slider>) : null
+          }
+
+          {
+            state.viewPlayer ? (
+              <div onContextMenu={(e) => e.preventDefault()} data-current-index={state.currentindex}
+                style={joinStyles(state.fonts.background?.chapterStyle, state.fonts)}
+                className={"chapter-content vCenter " + state.fonts.className + " " + props.navigationChapterController} onClick={toggleOptions}>
+                <div>
+                  <div data-chapterindex={state.textToSpeechProgress}>
+                    {
+                      state.chapterContent.find(x => x.index == state.currentindex)?.html
+                    }
+                  </div>
+
+                </div>
+              </div>
+            ) : null
+          }
+          {
+            props.textSelectionMenu && props.textSelectionMenu.menus.length > 0 ? (
+              <Popover
+                render={
+                  ({ clientRect, isCollapsed, textContent }) => {
+                    try {
+                      if (clientRect == null || isCollapsed || !textContent || textContent.length <= 0) {
+                        return null
+                      }
+
+
+                      prevSelection.current = textContent || "";
+                      var row = "";
+                      var column = "";
+                      if (props.textSelectionMenu) {
+                        props.textSelectionMenu.menus.forEach((_, i) => {
+                          if (i % 3 === 0)
+                            row += " 1fr";
+                        });
+
+                        if (props.textSelectionMenu.menus.length >= 3)
+                          column = "1fr 1fr 1fr";
+                        else column = props.textSelectionMenu.menus.map(() => "1fr").join(" ");
+                      }
+                      var left = document.documentElement.scrollLeft + (clientRect.left + clientRect.width / 2);
+
+                      const style = {
+                        position: "absolute",
+                        left: left,
+                        top: document.documentElement.scrollTop + (clientRect.top - 40),
+                        marginLeft: -75,
+                        gridTemplateColumns: column,
+                        gridTemplateRows: row
+                      } as React.CSSProperties
+                      const popupref = React.useRef(null as HTMLDivElement | null)
+                      const fixPosition = () => {
+                        if (popupref.current) {
+                          var pos = popupref.current.getBoundingClientRect();
+                          if (pos.left + pos.width > window.outerWidth) {
+                            popupref.current.style.left = "unset";
+                            popupref.current.style.right = "6px";
+                          }
+                        }
+                      }
+                      React.useEffect(() => {
+                        fixPosition();
+                      }, [popupref.current])
+
+                      React.useEffect(() => {
+                        fixPosition();
+                      }, [])
+
+                      var sElement = getSelectionTextAndContainerElement();
+
+                      if (!sElement || !sElement.containerElement)
+                        return null;
+                      else if (!sElement.containerElement.classList.contains("chapter-content") && !sElement.containerElement.closest(".chapter-content"))
+                        return null;
+                      if (sElement.containerElement.closest(".cover"))
+                        return null;
+
+                      return <div ref={(c => {
+                        popupref.current = c;
+                        fixPosition();
+                      })} className={"bookContextMenu " + state.fonts.className} style={style}>
+                        {
+                          props.textSelectionMenu?.menus.map((x, i) => (
+                            <a key={i} href="#" onClick={() => {
+                              var result = {
+                                selectedText: textContent,
+                                rec: clientRect,
+                                menuIndex: i
+                              } as SelectionResult
+                              if (props.textSelectionMenu?.click)
+                                props.textSelectionMenu.click(result);
+                            }}>
+                              {
+                                x.icon && typeof x.icon === "string" ? (<img src={x.icon} />) : null
+                              }
+                              {
+                                x.icon && typeof x.icon !== "string" ? (x.icon) : null
+                              }
+                              {x.text}
+                            </a>
+                          ))
+                        }
+                      </div>
+                    } catch (e) {
+                      console.log(e)
+                      // alert("Error")
+                      return null;
+                    }
+                  }
+                }
+              />
+            ) : null
+          }
+        </div>
+        <Body></Body>
+      </Context.Provider>
     </Fragment >
   )
 }
 
-
 class WebBookReader extends BookReaderBase {
   protected readonly ___element: JSX.Element;
+  static DefaultSettings = defaultSettings;
   constructor(options: BookOptions) {
     super(options);
-    this.___element = <BookReaderElement props={this.bookOptions} selector={this} />;
+    this.___element = <BookReaderElement props={this.bookOptions} DefaultSettings={{ ...WebBookReader.DefaultSettings }} selector={this} />;
   }
 
   renderTo(selector: string) {
@@ -475,9 +674,10 @@ class WebBookReader extends BookReaderBase {
 
 class ReactBookReader extends BookReaderBase {
   protected readonly ___element: JSX.Element;
+  static DefaultSettings = defaultSettings;
   constructor(options: BookOptions) {
     super(options);
-    this.___element = <BookReaderElement props={this.bookOptions} selector={this} />;
+    this.___element = <BookReaderElement props={this.bookOptions} selector={this} DefaultSettings={{ ...ReactBookReader.DefaultSettings }} />;
   }
 
   render() {
@@ -486,8 +686,7 @@ class ReactBookReader extends BookReaderBase {
 }
 
 if (window != undefined) // this is for web
-  (window as any).BookReader = function (options: BookOptions) {
-    return new WebBookReader(options);
-  }
-
+{
+  window["BookReader"] = WebBookReader;
+}
 export default ReactBookReader;

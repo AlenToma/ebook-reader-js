@@ -12,10 +12,9 @@
         "node": ">=10"
     },
     "scripts": {
-        "build": "microbundle-crl  --compress --css-modules false --format modern ,cjs  ",
+        "build": "microbundle-crl --tsconfig tsconfig.json --compress --css-modules false --format modern ,cjs  ",
         "buildWithFonts": "copyfiles -u 2 src/book_fonts/* dist/book_fonts && npm run build",
-        "start": "microbundle-crl watch --no-compress --css-modules false --format modern,cjs",
-        "copyjavascript": "copyfiles -u 2 src/core/*.css dist/core",
+        "start": "microbundle-crl watch --tsconfig tsconfig.json --no-compress --css-modules false --format modern,cjs",
         "ready": "npm run build && npm run copyjavascript",
         "prepare": "run-s build",
         "test": "run-s test:unit test:lint test:build",
@@ -35,6 +34,7 @@
         "@types/node": "^12.12.38",
         "@types/react": "^16.9.27",
         "@types/react-dom": "^16.9.7",
+        "@types/react-ranger": "^2.0.1",
         "@typescript-eslint/eslint-plugin": "^2.26.0",
         "@typescript-eslint/parser": "^2.26.0",
         "awesome-typescript-loader": "^5.2.1",
@@ -74,6 +74,7 @@
         "keen-slider": "^6.6.4",
         "lodash": "^4.17.21",
         "react": "^16.14.0",
+        "react-app-polyfill": "^3.0.0",
         "react-ranger": "^2.1.0",
         "react-text-selection-popover": "^2.0.1"
     }

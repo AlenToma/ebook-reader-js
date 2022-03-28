@@ -24,11 +24,14 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "stripInternal": true
   },
   "include": [
     "src",
-    "src/**/*.css"
+    "src/**/*.css",
+    "src/**/*.ttf",
+    "src/**/*.otf"
   ],
   "exclude": [
     "node_modules",

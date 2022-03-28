@@ -162,3 +162,66 @@
     font-weight: normal;
     font-style: normal;
 }
+
+.icons {
+    width: 38px;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+}
+
+.rotateRight {
+    -webkit-transform: rotate(88deg);
+    /* WebKit */
+    -moz-transform: rotate(88deg);
+    /* Mozilla */
+    -o-transform: rotate(88deg);
+    /* Opera */
+    -ms-transform: rotate(88deg);
+    /* Internet Explorer */
+    transform: rotate(88deg);
+}
+
+.flip {
+    -webkit-transform: rotate(180deg);
+    /* WebKit */
+    -moz-transform: rotate(180deg);
+    /* Mozilla */
+    -o-transform: rotate(180deg);
+    /* Opera */
+    -ms-transform: rotate(180deg);
+    /* Internet Explorer */
+    transform: rotate(180deg);
+}
+
+.icons:not(.disabled):hover,
+.icons:not(.disabled).selected {
+    opacity: 0.5;
+    fill: red
+}
+
+p.title {
+    margin: 0;
+    width: 100%;
+}
+
+span.subtitle {
+    clear: both;
+    position: relative;
+    display: block;
+    font-size: 85%;
+}
+
+.center {
+    display: grid;
+    justify-content: center;
+    text-align: center;
+}
+
+.vCenter {
+    display: flex !important;
+    align-items: center !important;
+}
+
+h2.title {
+    font-size: 18px;
+}

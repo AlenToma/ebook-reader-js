@@ -1,4 +1,6 @@
 import IDOMParser from 'advanced-html-parser'
+import React from 'react';
+import { CSSStyle } from './typings';
 export const getSelectionText = () => {
     var text = "";
     var w = window as any;
@@ -51,7 +53,7 @@ export const scaleUp = (element?: HTMLElement, callback?: Function) => {
         element.style.transform = "scale(1)";
         setTimeout(() => {
             callback?.()
-        }, 800);
+        }, 502);
 
     }
 }
@@ -125,14 +127,21 @@ export function isEmptyOrSpaces(str: string) {
     return str === null || str.match(/^ *$/) !== null;
 }
 
-export const cleanHtml = (html: string) => {
+export const cleanHtml = (html: string, indentSplitterCount: number) => {
     var container = document.createElement("div");
     container.innerHTML = html;
+
     var unwantedData = Array.from(container.querySelectorAll("script, style")).map(x => x.outerHTML).join("\n");
     container.querySelectorAll("script, style").forEach(x => x.remove());
-    var text = IDOMParser.parse(container.outerHTML).documentElement.text().split(/\r?\n/).filter(x => !isEmptyOrSpaces(x)).map(x => `<p>${x}</p>`).join("\n");
+    var text = IDOMParser.parse(container.outerHTML).documentElement.text().split(/\r?\n/).filter(x => !isEmptyOrSpaces(x)).map(x => `<p style='padding-bottom:${indentSplitterCount * 5}px'>${x}</p>`).join("\n");
     return `<div>${unwantedData + text}</div>`
+}
 
+export const getTextArray = (html: string) => {
+    var container = document.createElement("div");
+    container.innerHTML = html;
+    container.querySelectorAll("script, style, input").forEach(x => x.remove());
+    return IDOMParser.parse(container.outerHTML).documentElement.text().split(/\r?\n/).filter(x => !isEmptyOrSpaces(x));
 }
 
 export const elementSize = (el: HTMLElement) => {
@@ -155,6 +164,20 @@ export const elementSize = (el: HTMLElement) => {
     }
 }
 
+export const joinStyles = (...style: (CSSStyle | React.CSSProperties | undefined)[]) => {
+    var result = {} as CSSStyle;
+    style.map(x => {
+        if (x !== undefined) {
+            var st = { ...x } as any;
+            delete st.background;
+            delete st.className;
+            delete st.title;
+            result = Object.assign(result, st);
+        }
+    });
+    return result as React.CSSProperties;
+}
+
 export const clearFonts = (el: HTMLElement) => {
     if (el.style) {
         el.style.fontFamily = "";
@@ -171,3 +194,90 @@ export const clearFonts = (el: HTMLElement) => {
 
     return el;
 }
+
+export const formatText = function (cleanText: string, maxCounter: number) {
+    var container = document.createElement("div");
+    container.innerHTML = cleanText;
+    container.querySelectorAll("script, style, input").forEach(x => x.remove());
+    
+    var txt =  IDOMParser.parse(container.outerHTML).documentElement.text();
+    var txtArray = [] as string[];
+    var str = '';
+  
+    txt = txt
+      .replace(/(?=&)(.*?)(;)/g, '')
+      .replace(/[;]/g, '')
+      .trim();
+    var foundSeperator = false;
+    var index = 0;
+    var addedSpace = false;
+  
+    const trimStart = () => {
+      str = str.trim();
+      while (
+        str.startsWith('.') ||
+        str.startsWith(',') ||
+        str.startsWith('!') ||
+        str.startsWith('”')
+      )
+        str = str.substring(1).trim();
+      return str;
+    };
+  
+    const getNext = () => {
+      var r = '';
+      index++;
+      if (txt.length > index) r = txt[index];
+      if (r == '\r' || r == '\n' || r == '"') r = 'a';
+      return r;
+    };
+    var pValue = '';
+  
+    for (var x of txt) {
+      if (x == '.' && str.trim().endsWith('.') || (x == "…" && isEmptyOrSpaces(str))) {
+        continue
+      };
+  
+      if (isEmptyOrSpaces(str) && (x == '.' || x == '?' || x == '!' || x == ',' || x == ":"))
+        continue;
+  
+      if (x !== '\r' && x !== '\n' && x !== '"') {
+        if (!addedSpace || x != ' ') {
+          str += x;
+        }
+        addedSpace = false;
+      } else if (x == '\r' || x == '\n') str = str.trim() + " "
+  
+      var next = getNext();
+      if ((x == '.' || x == '?' || x == '!' || x == ',' || x == "”" || x == ":") && /[\p{L}|\p{N}]/giu.test(next)) {
+        if ((x !== ',' && x !== '.') || (!/[\p{N}]/giu.test(pValue) || !/[\p{N}]/giu.test(next))) {
+          str = str.trim() + " "
+          addedSpace = true;
+        }
+      }
+      var r = undefined;
+      const seperatorsWords = [/chapter /gmi, /:/gmi, /level /gmi, / hp /gmi, /[0-9]\/[0-9]/gmi, /[0-9]\-[0-9]/gmi, /[0-9]\,[0-9]/gmi, /([ ]+[mr|Mrs|Ms|Miss]+[\.]).*/gmi, /\[|\(|\)|\]/gmi]
+      if (str != "" && (r = seperatorsWords.find(a => a.test(str)))) {
+        foundSeperator = true;
+      }
+  
+      const reset = () => {
+        foundSeperator = false;
+        str = '';
+        addedSpace = false;
+        pValue = '';
+      }
+  
+  
+      if ((str.length >= maxCounter && ((x == '.' && next != '”') || (pValue == '.' && x == '”'))) || (foundSeperator === true && (x == '\r' || x == '\n'))
+      ) {
+        txtArray.push(trimStart());
+        reset();
+      } else pValue = x;
+    }
+    if (str.length > 0) {
+      txtArray.push(trimStart());
+    }
+  
+    return txtArray.filter(x => x !== undefined && !isEmptyOrSpaces(x));
+  }

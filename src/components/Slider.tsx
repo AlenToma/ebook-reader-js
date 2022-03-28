@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 import { useKeenSlider } from "keen-slider/react"
 import TextEmulator from "./TextEmulator"
 import "keen-slider/keen-slider.min.css"
 import "../index.css"
 import { getSelectionText } from '../Methods'
+import appContext from "../Context"
 
 const SliderX = ({ children, changed, index }: { changed: (sl: number) => void, index: number, children: any[], disabled?: boolean }) => {
     const [currentSlide, setCurrentSlide] = React.useState(index)
@@ -52,6 +53,7 @@ const SliderX = ({ children, changed, index }: { changed: (sl: number) => void, 
 
 
 export default ({ children, onChapterLoad, currentIndex }: { currentIndex: number, onChapterLoad: (currentChapter: number) => Promise<void>, children?: (JSX.Element | null | undefined) }) => {
+    const context = useContext(appContext)
     const [currentSlide, setCurrentSlide] = React.useState(currentIndex > 0 ? 1 : 0)
     const prevSlider = useRef(currentIndex > 0 ? 1 : 0)
     const prevIndex = useRef(0)
@@ -60,16 +62,18 @@ export default ({ children, onChapterLoad, currentIndex }: { currentIndex: numbe
     const loadData = () => {
         var index = currentIndex;
         if (prevSlider.current != currentSlide) {
-            if (prevSlider.current > currentSlide)
-                index = index - 1;
-            else index = index + 1;
+            if (prevSlider.current > currentSlide) {
+                if (context.hasPrev())
+                    index = index - 1;
+            }
+            else if (context.hasNext()) index = index + 1;
         }
+
         prevSlider.current = index > 0 ? 1 : 0;
         prevIndex.current = index;
         onChapterLoad(index).then(data => {
             setLoading(true)
         });
-
     }
 
     React.useEffect(() => {
@@ -95,12 +99,20 @@ export default ({ children, onChapterLoad, currentIndex }: { currentIndex: numbe
     if (loading)
         return null
 
+    let index = currentIndex > 0 ? 1 : 0;
+    let tItem = currentIndex > 0 ? 3 : 2;
+    if (!context.hasNext()) {
+        if (currentIndex != 0)
+            index = 1;
+        tItem--;
+
+    }
 
     return (
-        <SliderX index={currentIndex > 0 ? 1 : 0} changed={(sl) => setCurrentSlide(sl)}>
-            {[...Array(currentIndex > 0 ? 3 : 2)].map((x, idx) =>
+        <SliderX index={index} changed={(sl) => setCurrentSlide(sl)}>
+            {[...Array(tItem)].map((x, idx) =>
             (
-                (currentIndex > 0 && idx == 1) || (currentIndex == 0 && idx == 0) ? <div key={idx}>{children}</div> : <TextEmulator key={idx} />
+                (index > 0 && idx == 1) || (index == 0 && idx == 0) ? <div key={idx}>{children}</div> : <TextEmulator key={idx} />
             )
             )}
         </SliderX>

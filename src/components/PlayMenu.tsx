@@ -23,7 +23,7 @@ export default () => {
     const hasNext = context.state.textToSpeechProgress + 1 < context.state.playableText.length;
     const hasPrev = context.state.textToSpeechProgress - 1 >= 0;
     return (
-        <div style={context.state.fonts.background?.bookMenuStyle} className={"options PlayTop animate " +( context.state.viewBookMenu ? "" : " alone")}>
+        <div style={context.state.fonts.background?.bookMenuStyle} className={"options PlayTop animate " + (context.state.viewBookMenu ? "" : " alone")}>
             <div className={context.state.fonts.className}>
                 <div style={{ position: "relative", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <div
@@ -34,7 +34,7 @@ export default () => {
                                 boxShadow: "inset 0 1px 2px rgba(0,0,0,.6)",
                                 borderRadius: "2px",
                                 width: "80%",
-                                marginLeft:22,
+                                marginLeft: 22,
                             }
                         })}
                     >
@@ -54,7 +54,7 @@ export default () => {
                                     }
                                 })}>
                                 <span style={{ color: "white" }}>{
-                                    ((context.state.textToSpeechProgress / (context.state.playableText.length -1)) * 100).toFixed(0)
+                                    ((context.state.textToSpeechProgress / (context.state.playableText.length - 1)) * 100).toFixed(0)
                                 }%</span>
                             </button>
                         ))}
@@ -71,7 +71,13 @@ export default () => {
                     <a style={{ marginLeft: 20 }} className={!hasNext ? "disabled" : ""} onClick={() => context.playNext()}>
                         <Icons svgName="PlayPrev" className={(!hasNext ? "disabled" : "") + " flip"} color={context.state.fonts.background?.playerStyle.color || "gray"} />
                     </a>
-
+                    {
+                        context.props.playerMenu?.buttons?.map((x, i) => {
+                            <a className={x.className} onClick={x.action} title={x.title} key={i}> {
+                                typeof x.icon === "string" ? <img src={x.icon} /> : x.icon
+                            } </a>
+                        })
+                    }
 
                 </div>
             </div>

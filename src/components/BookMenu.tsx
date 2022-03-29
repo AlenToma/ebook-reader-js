@@ -34,9 +34,11 @@ export default ({ saveFontSettings }: { saveFontSettings: (item: CSSStyle) => vo
                     }
                     {
                         context.props.bookMenu && context.props.bookMenu.buttons ? (
-                            context.props.bookMenu.buttons.map((x, index) => (<a className={x.className} onClick={x.action} title={x.title}> {
+                            context.props.bookMenu.buttons.map((x, index) => (
+                            <a className={x.className} onClick={x.action} title={x.title} key={index}> {
                                 typeof x.icon === "string" ? <img src={x.icon} /> : x.icon
-                            } </a>))
+                            } </a>
+                            ))
                         ) : null
                     }
                 </div>

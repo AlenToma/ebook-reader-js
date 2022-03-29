@@ -1,4 +1,3 @@
-import 'react-app-polyfill/ie11'
 import React, { useEffect, useRef } from 'react'
 import data from './temp/jsonData.json'
 

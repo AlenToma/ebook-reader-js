@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import 'react-app-polyfill/ie11'
 import * as React from 'react';
 import { Fragment, useEffect } from "react"
 import { BookOptions, Chapter, SelectionResult, FontSettings, BookReader, IState, CSSStyle, Language, IframeSettings } from './typings';
@@ -451,10 +450,7 @@ const BookReaderElement = ({ props, selector, DefaultSettings }: { props: BookOp
       return;
 
     if (prevSelection.current.length > 0) {
-      animateToggleTimer.current = setTimeout(() => {
-        prevSelection.current = "";
-      }, 100);
-
+      prevSelection.current = "";
       return;
     } else {
       animateToggleTimer.current = setTimeout(() => {

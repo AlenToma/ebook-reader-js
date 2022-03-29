@@ -20,9 +20,11 @@ module.exports = {
                 use: ["style-loader", "css-loader"],
             },
             {
-                test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/i,
-                // More information here https://webpack.js.org/guides/asset-modules/
-                type: "asset",
+                test: /\.(jpe?g|png|ttf|eot|svg|otf|woff(2)?)(\?[a-z0-9=&.]+)?$/,
+                use: [{
+                    loader: 'base64-inline-loader'
+                }],
+                type: 'javascript/auto'
             },
         ],
     },

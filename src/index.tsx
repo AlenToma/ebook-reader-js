@@ -498,13 +498,13 @@ const BookReaderElement = ({ props, selector, DefaultSettings }: { props: BookOp
           {
             state.navigationChapterController == "Scroll" && !state.viewPlayer ? (
               <div onContextMenu={(e) => e.preventDefault()} data-current-index={state.currentindex}
-                style={joinStyles(state.fonts.background?.chapterStyle, state.fonts, { paddingTop: state.currentindex > 0 && !state.chapterContent.find(x=> x.index === 0) ? startScrollPos : undefined, paddingBottom: startScrollPos })}
+                style={joinStyles(state.fonts.background?.chapterStyle, state.fonts, { paddingTop: state.currentindex > 0 && !state.chapterContent.find(x => x.index === 0) ? startScrollPos : undefined, paddingBottom: startScrollPos })}
                 className={"chapter-content " + state.fonts.className + " " + props.navigationChapterController} onClick={toggleOptions}>
                 <div>
                   {
                     state.chapterContent.map((x, index) => (
                       <div className={index > 0 ? "break" : ""} key={x.index} data-chapterindex={x.index}>
-                         {x.index === 0 ? getFrontPage() : null}
+                        {x.index === 0 ? getFrontPage() : null}
                         {
                           props.book.showChapterTitle ? (
                             <h2 className='chapter-title'>{x.chapter.title}</h2>

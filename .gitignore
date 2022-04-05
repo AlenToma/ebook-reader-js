@@ -1,4 +1,8 @@
-node_modules
-example/node_modules
-example/build
-package-lock.json
+ebook-reader-js/node_modules
+ebook-reader-js/example/node_modules
+ebook-reader-js/example/build
+ebook-reader-js/package-lock.json
+
+
+react-native-example/node_modules
+react-native-example/package-lock.json

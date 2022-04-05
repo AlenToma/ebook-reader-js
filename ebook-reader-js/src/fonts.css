@@ -1,0 +1,227 @@
+@font-face {
+    font-family: CardiffItalic;
+    src: url(./book_fonts/CardiffItalic.ttf);
+}
+
+.CardiffItalic {
+    font-family: CardiffItalic !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: DroidSerif;
+    src: url(./book_fonts/DroidSerif.ttf);
+}
+
+.DroidSerif {
+    font-family: DroidSerif !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: FreeSerif;
+    src: url(./book_fonts/FreeSerif.ttf);
+}
+
+.FreeSerif {
+    font-family: FreeSerif !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: JunicodeBold;
+    src: url(./book_fonts/JunicodeBold.ttf);
+}
+
+.JunicodeBold {
+    font-family: JunicodeBold !important;
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: LibreBaskerville;
+    src: url(./book_fonts/LibreBaskerville.ttf);
+}
+
+.LibreBaskerville {
+    font-family: LibreBaskerville !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: LinuxLibertine;
+    src: url(./book_fonts/LinuxLibertine.ttf);
+}
+
+.LinuxLibertine {
+    font-family: LinuxLibertine !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: LISTFCEI;
+    src: url(./book_fonts/LISTFCEI.ttf);
+}
+
+.LISTFCEI {
+    font-family: LISTFCEI !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: Newathenaunicode;
+    src: url(./book_fonts/Newathenaunicode.ttf);
+}
+
+.Newathenaunicode {
+    font-family: Newathenaunicode !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: OpenBaskerville;
+    src: url(./book_fonts/OpenBaskerville.otf);
+}
+
+.OpenBaskerville {
+    font-family: OpenBaskerville !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: Oxford;
+    src: url(./book_fonts/Oxford.ttf);
+}
+
+.Oxford {
+    font-family: Oxford !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: PortlandLdo;
+    src: url(./book_fonts/PortlandLdo.ttf);
+}
+
+.PortlandLdo {
+    font-family: PortlandLdo !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: QueensPark;
+    src: url(./book_fonts/QueensPark.ttf);
+}
+
+.QueensPark {
+    font-family: QueensPark !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: SourceSansPro;
+    src: url(./book_fonts/SourceSansPro.ttf);
+}
+
+.SourceSansPro {
+    font-family: SourceSansPro !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: TexgyrebonumRegular;
+    src: url(./book_fonts/TexgyrebonumRegular.otf);
+}
+
+.TexgyrebonumRegular {
+    font-family: TexgyrebonumRegular !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: TheanoDidot;
+    src: url(./book_fonts/TheanoDidot.ttf);
+}
+
+.TheanoDidot {
+    font-family: TheanoDidot !important;
+    font-weight: normal;
+    font-style: normal;
+}
+
+.icons {
+    width: 38px;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+}
+
+.rotateRight {
+    -webkit-transform: rotate(88deg);
+    /* WebKit */
+    -moz-transform: rotate(88deg);
+    /* Mozilla */
+    -o-transform: rotate(88deg);
+    /* Opera */
+    -ms-transform: rotate(88deg);
+    /* Internet Explorer */
+    transform: rotate(88deg);
+}
+
+.flip {
+    -webkit-transform: rotate(180deg);
+    /* WebKit */
+    -moz-transform: rotate(180deg);
+    /* Mozilla */
+    -o-transform: rotate(180deg);
+    /* Opera */
+    -ms-transform: rotate(180deg);
+    /* Internet Explorer */
+    transform: rotate(180deg);
+}
+
+.icons:not(.disabled):hover,
+.icons:not(.disabled).selected {
+    opacity: 0.5;
+    fill: red
+}
+
+p.title {
+    margin: 0;
+    width: 100%;
+}
+
+span.subtitle {
+    clear: both;
+    position: relative;
+    display: block;
+    font-size: 85%;
+}
+
+.center {
+    display: grid;
+    justify-content: center;
+    text-align: center;
+}
+
+.vCenter {
+    display: flex !important;
+    align-items: center !important;
+}
+
+h2.title {
+    font-size: 18px;
+}

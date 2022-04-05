@@ -1,0 +1,449 @@
+.book {
+    width: 75vw;
+    display: block;
+    margin: auto;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0px 0px white, 0em 0px 0.2em #c1c1c12b;
+    box-sizing: border-box;
+    border: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+
+.chapter-content {
+    padding-top: 10px;
+    overflow: hidden;
+    min-height: 105vh;
+}
+
+.chapter-content.vCenter {
+    min-height: 94vh !important;
+}
+
+.chapter-content .chapter-title {
+    color: #c0c2cc;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.5;
+}
+
+.chapter-content comment {
+    border: 1px solid gray;
+    background: gray;
+    border-radius: 22px;
+    margin-left: 5px;
+    padding: 0px 3px;
+    display: inline-block;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: .25px;
+    color: #fff;
+    background: #c0c2cc;
+    border-radius: 18px;
+    position: relative;
+    cursor: pointer;
+    transition: opacity .3s .3s;
+    text-indent: 0px;
+}
+
+.break {
+    border-top: 1px solid #e4e4e4;
+}
+
+.book .keen-slider__slide {
+    zoom: 1;
+    -webkit-user-select: text !important;
+    user-select: text !important;
+}
+
+.bookContextMenu {
+    display: grid;
+    z-index: 99999999;
+    justify-content: space-around;
+    background: white;
+    font-size: 1em;
+    text-align: center;
+    color: rgb(24, 24, 24);
+    border-radius: 3px;
+    min-width: 150px;
+    min-height: 30px;
+    align-items: center;
+    box-shadow: 1px 0px 3px 1px grey;
+    overflow: hidden;
+}
+
+.bookContextMenu a {
+    padding: 6px;
+    width: 84%;
+    text-decoration: none;
+    color: inherit;
+}
+
+.bookContextMenu a:not(.disabled):hover {
+    opacity: 0.8;
+    background: gray;
+}
+
+.book a,
+.popup a {
+    cursor: pointer;
+}
+
+.book>.options {
+    border-radius: 5px;
+    position: fixed;
+    width: 35px;
+    padding: 5px;
+    min-height: 100vh;
+    border: 1px solid #CCC;
+    display: block;
+    z-index: 1;
+    background: white;
+    opacity: 0;
+    visibility: hidden;
+    box-shadow: 1px 1px white, -1em 0 0.4em #c1c1c12b;
+    border: 0;
+}
+
+.book>.options.PlayTop {
+    top: -70px;
+    width: 100%;
+    height: 35px;
+    overflow: hidden;
+    max-height: 35px;
+    min-height: 35px;
+    left: 0;
+    display: inline-table;
+    -webkit-transtition: top .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    transition: top .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    box-shadow: 0px 0px white, 0em 2px 0em #c1c1c12b !important;
+    border-radius: 0 !important;
+}
+
+.book>.options.Bottom {
+    width: 100%;
+    height: 100px;
+    overflow: hidden;
+    max-height: 35px;
+    min-height: 100px;
+    display: inline-table;
+    border-radius: 0;
+    bottom: -100px;
+    -webkit-transtition: bottom .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    transition: bottom .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+}
+
+.book>.options.Right {
+    right: -70px;
+    top: 8px;
+    -webkit-transtition: right .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    transition: right .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+}
+
+.book>.options.Top {
+    top: -70px;
+    width: 100%;
+    height: 35px;
+    overflow: hidden;
+    max-height: 35px;
+    min-height: 35px;
+    left: 0;
+    display: inline-table;
+    -webkit-transtition: top .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    transition: top .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    box-shadow: 0px 0px white, 0em 2px 0em #c1c1c12b !important;
+    border-radius: 0 !important;
+}
+
+.book>.options.animate {
+    visibility: visible;
+    opacity: 0.9;
+}
+
+.book>.options.PlayTop.animate.alone {
+    top: 0px !important;
+    -webkit-transtition: bottom .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out !important;
+    transition: bottom .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out !important;
+}
+
+.book>.options.PlayTop.animate {
+    visibility: visible !important;
+    top: 55px !important;
+    -webkit-transtition: top .3s ease-in-out !important;
+    transition: top .3s ease-in-out !important;
+}
+
+.book>.options.Bottom.animate {
+    bottom: 10px;
+    -webkit-transtition: bottom .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    transition: bottom .3s ease-in-out, visibility .3s ease-in-out, opacity .3s ease-in-out;
+    box-shadow: 0px 0px white, 0em 2px 0em #c1c1c12b !important;
+    border-radius: 0 !important;
+}
+
+.Right.animate {
+    visibility: visible !important;
+    right: 0 !important;
+    -webkit-transtition: right .3s ease-in-out !important;
+    transition: right .3s ease-in-out !important;
+}
+
+.Top.animate {
+    visibility: visible !important;
+    top: 0px !important;
+    -webkit-transtition: top .3s ease-in-out !important;
+    transition: top .3s ease-in-out !important;
+}
+
+.book>.options.Top>div>div {
+    display: flex !important;
+    justify-content: space-around;
+    min-width: 76px;
+    float: right;
+    margin: 0;
+    padding: 0;
+    margin-right: 10px;
+}
+
+.book>.options>div>div:not(.Top >div>div) {
+    justify-content: center;
+    align-items: center;
+    display: grid;
+}
+
+.book>.options>div>div>a,
+.book>.tbContent a {
+    display: flex;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+    padding: 2px 2px;
+}
+
+.book>.options>div>div>a:not(.disabled):hover,
+.book>.options>div>div>a:not(.disabled):active {
+    opacity: 0.9;
+    box-shadow: 0px 0px white, 0em 0 0.4em #c1c1c12b;
+    border-radius: 3px;
+}
+
+.chapter-content .cover {
+    display: flex;
+    justify-content: center;
+}
+
+.chapter-content .cover {
+    display: grid;
+    justify-content: center;
+    border-bottom: 1px solid #dddd;
+    padding-bottom: 20px;
+    padding-top: 24px;
+}
+
+.chapter-content .cover img {
+    max-width: 210px;
+    margin: auto;
+}
+
+.chapter-content .cover>div {
+    display: grid;
+    justify-content: center;
+    width: 100%;
+}
+
+.popup {
+    background: white;
+    border: 1px solid gray;
+    border-radius: 5px;
+    position: fixed;
+    display: block;
+    min-height: 35vh;
+    box-shadow: 1px 1px #f40000, 0em 0em 0.4em red;
+    left: 50%;
+    top: 50%;
+    max-width: 90vw;
+    max-height: 70vh;
+    overflow: hidden;
+    min-width: 300px;
+    -webkit-transform: translate(-50%, -50%) scale(0);
+    -moz-transform: translate(-50%, -50%) scale(0);
+    -ms-transform: translate(-50%, -50%) scale(0);
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform .3s ease-in-out;
+}
+
+.popup.show {
+    z-index: 200;
+    -webkit-transform: translate(-50%, -50%) scale(1);
+    -moz-transform: translate(-50%, -50%) scale(1);
+    -ms-transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) scale(1);
+    transition: transform .3s ease-in-out;
+}
+
+.popup>div {
+    padding: 10px;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+    max-height: 60vh;
+}
+
+.list>a {
+    width: 95%;
+    padding: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    font-size: 12px;
+}
+
+.list a:nth-child(even) {
+    background: #870000;
+    color: white;
+}
+
+a.selected {
+    color: #a3f700 !important;
+}
+
+.popup>h1 {
+    width: 100%;
+    padding: 5px;
+    margin: 0;
+    font-size: 16px;
+    border-bottom: 1px solid gray;
+    height: 35px;
+    display: grid;
+    align-items: center;
+}
+
+a.close {
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    cursor: pointer;
+    color: red;
+}
+
+.blur {
+    position: fixed;
+    z-index: 199;
+    top: 0;
+    left: 0;
+    background: #000;
+    opacity: 0.5;
+    width: 100vw;
+    height: 100vh;
+}
+
+.textEmulator {
+    position: absolute;
+    width: 100%;
+}
+
+.textEmulator p {
+    width: 90%;
+    height: 10px;
+    background: gray;
+    animation: textEmulator 0.3s infinite;
+    margin-left: 5%;
+}
+
+.textEmulator p:nth-child(odd) {
+    width: 40%;
+}
+
+.textEmulator p:nth-child(even) {
+    width: 70%;
+}
+
+.textEmulator p:nth-child(3n+0) {
+    width: 90%;
+}
+
+.keen-slider {
+    border-radius: 10px;
+}
+
+.keen-slider img:not([src]) {
+    display: none;
+}
+
+.keen-slider[data-keen-slider-disabled] {
+    position: relative;
+    display: flex;
+}
+
+.keen-slider[data-keen-slider-disabled]>div {
+    position: relative;
+}
+
+.keen-slider[data-keen-slider-disabled]>div[data-keen-slider-current='true'] {
+    width: 100%;
+}
+
+@keyframes textEmulator {
+    from {
+        opacity: 0.1;
+    }
+    to {
+        opacity: 0.8
+    }
+}
+
+@media only screen and (max-width: 1022px) {
+    .book {
+        width: 100vw;
+        margin-top: 0;
+        border-radius: 0;
+    }
+    .keen-slider {
+        border-radius: 0;
+    }
+}
+
+.form {
+    width: 100%;
+    position: relative;
+}
+
+.form>div {
+    display: grid;
+    grid-template-columns: 0.8fr 1fr;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.fontBackground {
+    display: flex;
+    height: 60px;
+    padding-left: 10px;
+}
+
+.fontBackground>a {
+    border-radius: 30px;
+    padding: 10px;
+    width: 23px;
+    height: 23px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 1px 1px #cd2727, 0em 0px 0.4em #fa12122b;
+    margin-right: 10px;
+    font-size: 10px;
+    text-align: center;
+}
+
+.fontBackground>a.selected {
+    opacity: 0.5 !important;
+}
+
+.disabled {
+    opacity: 0.5 !important;
+}

@@ -1,0 +1,29 @@
+{
+    "name": "ebookksexample",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "android": "react-native run-android --port=8088",
+        "ios": "react-native run-ios",
+        "start": "react-native start --port=8088"
+    },
+    "dependencies": {
+        "ebook-reader-js": "github:AlenToma/ebook-reader-js",
+        "expo": "~44.0.2",
+        "expo-splash-screen": "~0.14.1",
+        "expo-status-bar": "~1.2.0",
+        "react": "17.0.1",
+        "react-dom": "17.0.1",
+        "react-native": "0.64.3",
+        "react-native-web": "0.17.1",
+        "react-native-webview": "^11.17.2"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.17.6",
+        "@babel/core": "^7.17.8",
+        "@babel/preset-typescript": "^7.16.7",
+        "@types/react": "^17.0.43",
+        "@types/react-native": "^0.67.3"
+    },
+    "private": true
+}
